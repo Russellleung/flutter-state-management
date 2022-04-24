@@ -1,29 +1,76 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:provider_example/providers/counter_provider.dart';
+import 'package:provider_example/screens/third_screen.dart';
 
 class MyHomePage extends StatelessWidget {
   MyHomePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    return MaterialApp(
+      home: DefaultPage(),
+    );
+  }
+}
+
+class DefaultPage extends StatefulWidget {
+  @override
+  _DefaultPageState createState() => _DefaultPageState();
+}
+
+class _DefaultPageState extends State<DefaultPage> with AutomaticKeepAliveClientMixin<DefaultPage> {
+  bool keepAlive = true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Provider Example App (${context.watch<Counter>().count})'),
+      appBar: CustomAppBar(
+        appBar: AppBar(
+          title: Text("hello"),
+        ),
+        onTap: () {
+          print("hi");
+          Navigator.of(context).popUntil((route) => route.isFirst);
+        },
       ),
+
+      // AppBar(
+      //   title: Text('Provider Example App (${context.watch<Counter>().count})'),
+      // ),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-                'You have pushed the button this many times: ${context.watch<Counter>().count}'),
+            Text('You have pushed the button this many times: ${context.watch<Counter>().count}'),
             Count(),
             ElevatedButton(
               onPressed: () {
-                Navigator.pushNamed(context, '/second');
+                Navigator.of(context, rootNavigator: true).push(
+                  MaterialPageRoute(builder: (context) {
+                    return ThirdScreen(
+                      message: '',
+                      title: '',
+                    );
+                  }),
+                );
               },
-              child: Text('Launch screen'),
+              child: Text('Launch screen without nav bar'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context, rootNavigator: false).push(
+                  MaterialPageRoute(builder: (context) {
+                    return ThirdScreen(
+                      message: '',
+                      title: '',
+                    );
+                  }),
+                );
+              },
+              child: Text('Launch screen with nav bar'),
             ),
           ],
         ),
@@ -32,6 +79,7 @@ class MyHomePage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           FloatingActionButton(
+            heroTag: "btn1",
             key: Key('decrement_floatingActionButton'),
             onPressed: () => context.read<Counter>().decrement(),
             tooltip: 'Decrement',
@@ -41,6 +89,7 @@ class MyHomePage extends StatelessWidget {
             width: 10.0,
           ),
           FloatingActionButton(
+            heroTag: "btn2",
             key: Key('reset_floatingActionButton'),
             onPressed: () => context.read<Counter>().reset(),
             tooltip: 'Reset',
@@ -50,6 +99,7 @@ class MyHomePage extends StatelessWidget {
             width: 10.0,
           ),
           FloatingActionButton(
+            heroTag: "btn3",
             key: Key('increment_floatingActionButton'),
             onPressed: () => context.read<Counter>().increment(),
             tooltip: 'Increment',
@@ -59,6 +109,9 @@ class MyHomePage extends StatelessWidget {
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => keepAlive;
 }
 
 class Count extends StatelessWidget {
@@ -66,7 +119,21 @@ class Count extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text('${context.watch<Counter>().count}',
-        key: Key('counterState'), style: Theme.of(context).textTheme.headline4);
+    return Text('${context.watch<Counter>().count}', key: Key('counterState'), style: Theme.of(context).textTheme.headline4);
   }
+}
+
+class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final VoidCallback onTap;
+  final AppBar appBar;
+
+  const CustomAppBar({required this.onTap, required this.appBar});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(onLongPress: onTap, child: appBar);
+  }
+
+  @override
+  Size get preferredSize => new Size.fromHeight(kToolbarHeight);
 }

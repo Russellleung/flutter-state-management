@@ -3,8 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:provider_example/providers/counter_provider.dart';
 import 'package:provider_example/providers/shopping_cart_provider.dart';
 
-class SecondScreen extends StatelessWidget {
-  const SecondScreen({required this.title, required this.message});
+import 'home_screen.dart';
+
+class ThirdScreen extends StatelessWidget {
+  const ThirdScreen({required this.title, required this.message});
 
   final String title;
   final String message;
@@ -12,8 +14,14 @@ class SecondScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Provider Example App (${context.watch<Counter>().count})'),
+      appBar: CustomAppBar(
+        appBar: AppBar(
+          title: Text("hello"),
+        ),
+        onTap: () {
+          print("hi");
+          Navigator.of(context).popUntil((route) => route.isFirst);
+        },
       ),
       body: Center(
         child: Column(
